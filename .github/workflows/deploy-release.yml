@@ -1,0 +1,49 @@
+name: Build-Release-Artifact
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+
+  build_release:
+    name: build_release
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout source code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'latest'
+
+    - name: Install node dependencies
+      run: npm install
+
+    - name: "Build build_release-artifact"
+      run: npm build
+
+    - name: release
+      uses: comnoco/create-release@v2
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: ${{ github.ref }}
+        tag_name: ${{ github.ref }}
+        body_path: CHANGELOG.md
+
+    - name: upload artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./govwifi-shared-frontend-${{ github.ref }}.tgz
+        asset_name: ./govwifi-shared-frontend-${{ github.ref }}.tgz
+        asset_content_type: application/gzip
