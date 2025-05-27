@@ -27,8 +27,13 @@ jobs:
 
     - name: "Build build_release-artifact"
       run: npm run build
+
+    - name: "where wolly"
+      run: ls && ls ./dist
+
     - name: Get Tag Version
       run: echo "Tag name from github.ref_name ${{ github.ref_name}} "
+
     - name: release
       uses: softprops/action-gh-release@v2
       id: create_release
