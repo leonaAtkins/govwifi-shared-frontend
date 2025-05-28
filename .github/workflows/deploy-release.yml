@@ -25,7 +25,7 @@ jobs:
 
       - name: Get version from package.json
         id: get_version
-        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Check if tag exists
         run: |
@@ -40,7 +40,7 @@ jobs:
 
       - name: Get the last commit message
         id: get_message
-        run: echo "::set-output name=message::$(git log -1 --no-merges --pretty=%B)
+        run: echo "message=$(git log -1 --no-merges --pretty=%B)" >> "$GITHUB_OUTPUT"
 
       - name: Setup node
         uses: actions/setup-node@v4
