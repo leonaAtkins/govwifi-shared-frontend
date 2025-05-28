@@ -13,66 +13,60 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Checkout source code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ github.token }}
 
-    - name: Setup node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 'latest'
+      - name: Get version from package.json
+        id: get_version
+        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
 
-    - name: Install node dependencies
-      run: npm install
+      - name: Check if tag exists
+        run: |
+          if git rev-parse v${{ steps.get_version.outputs.version }} >/dev/null 2>&1; then
+            echo "Tag v${{ steps.get_version.outputs.version }} already exists, please ensure you have run \"npm version\" before committing"
+          fi
 
-    - name: "Build build_release-artifact"
-      run: npm run build
+      - name: Create tag
+        run: |
+          git tag -a v${{ steps.get_version.outputs.version }} -m "v${{ steps.get_version.outputs.version }}"
+          git push origin v${{ steps.get_version.outputs.version }}
 
-    - name: "where wolly"
-      run: ls && ls ./dist
+      - name: Get the last commit message
+        id: get_message
+        run: echo "::set-output name=message::$(git log -1 --no-merges --pretty=%B)
 
-    - name: Get version from package.json
-      id: get_version
-      run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
 
-    - name: Check if tag exists
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        if git rev-parse v${{ steps.get_version.outputs.version }} >/dev/null 2>&1; then
-          echo "Tag v${{ steps.get_version.outputs.version }} already exists, please ensure you have run \"npm version\" before committing"
-        fi
+      - name: Install node dependencies
+        run: npm install
 
-    - name: Create tag
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        git tag -a v${{ steps.get_version.outputs.version }} -m "v${{ steps.get_version.outputs.version }}"
-        git push origin v${{ steps.get_version.outputs.version }}
+      - name: "Build build_release-artifact"
+        run: npm run build
 
-    - name: Get the last commit message
-      id: get_message
-      run: echo "::set-output name=message::$(git log -1 --no-merges --pretty=%B)
+      - name: release
+        uses: softprops/action-gh-release@v2
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          name: ${{ steps.get_version.outputs.version }}
+          tag_name: v${{ steps.get_version.outputs.version }}
+          body: |
+              Changes in this Release ${{ steps.get_version.outputs.version }}
+              - echo ${{ steps.get_message.outputs.text }}
 
-    - name: release
-      uses: softprops/action-gh-release@v2
-      id: create_release
-      with:
-        draft: false
-        prerelease: false
-        name: ${{ steps.get_version.outputs.version }}
-        tag_name: v${{ steps.get_version.outputs.version }}
-        body: |
-            Changes in this Release ${{ steps.get_version.outputs.version }}
-            - echo ${{ steps.get_message.outputs.text }}
-
-    - name: upload artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/govwifi-shared-frontend-${{ steps.get_version.outputs.version }}.tgz
-        asset_name: govwifi-shared-frontend-${{ steps.get_version.outputs.version }}.tgz
-        asset_content_type: application/gzip
+      - name: upload artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/govwifi-shared-frontend-${{ steps.get_version.outputs.version }}.tgz
+          asset_name: govwifi-shared-frontend-${{ steps.get_version.outputs.version }}.tgz
+          asset_content_type: application/gzip
