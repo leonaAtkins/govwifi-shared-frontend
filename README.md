@@ -47,20 +47,19 @@ Amend the cookie policy to allow or disable the given
 
 4. Raise a PR. Once approved, merge the PR into the main branch.
 
-### Commit and push
+### Update artifact version
 
-When finished with updates, then update the version with the semantic version (major|minor|patch) et
+After all updates are committed and pushed, update the version with the semantic version (major|minor|patch) eg
 
     ```bash
     $ npm version patch
     ```
 
-Then commit and push to the repe
-Open and PR, when this is merged a new release and tag will be created.
-Then follow "Update GovWifi repos" to update the repos that rely on this artifact.
+Which will update the version in package.json, commit and push to the branch.
+Open a PR, then when this is merged, a new release and tag will be created.
+Then follow **Update GovWifi repos** to update the repos that rely on this artifact.
 
-
-### Build release package
+#### To build release package - manual release process only.
 
 The release package must be uploaded to GitHub as part of the release process so it can be downloaded by the repos which use `govwifi-shared-frontend`.
 
@@ -75,7 +74,7 @@ The release package must be uploaded to GitHub as part of the release process so
      upload to GitHub:
 
 
-### Update Github release version
+#### Update Github release version - manual release process only.
 
 Navigate to the `govwifi-shared-frontend` ["Releases"](https://github.com/govwifi/govwifi-shared-frontend/releases) page.
 

@@ -40,7 +40,7 @@ jobs:
 
       - name: Get the last commit message
         id: get_message
-        run: echo "message=$(git log -1 --no-merges --pretty=%B)" >> "$GITHUB_OUTPUT"
+        run: echo "text=$(git log -1 --no-merges --pretty=%B)" >> "$GITHUB_OUTPUT"
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -63,7 +63,7 @@ jobs:
           tag_name: v${{ steps.get_version.outputs.version }}
           body: |
               Changes in this Release ${{ steps.get_version.outputs.version }}
-              - echo ${{ steps.get_message.outputs.text }}
+              - ${{ steps.get_message.outputs.text }}
 
       - name: upload artifact
         uses: actions/upload-release-asset@v1
