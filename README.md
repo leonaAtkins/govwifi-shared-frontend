@@ -39,17 +39,18 @@ Amend the cookie policy to allow or disable the given
 
 1. Create a branch from the main branch and make any necessary code or library updates.
 
-2. Update the “version” in [`package.json`](https://github.com/govwifi/govwifi-shared-frontend/blob/master/package.json#L3). Additional features or major code changes trigger a major version bump. Dependabot updates are minor release changes. For more information review [semantic versioning docs](https://semver.org/).
-
-3. If you’ve updated any libraries run `npm install`.
+2. If you’ve updated any libraries run `npm install`.
 
     This will update the `package-lock.json` file which also must be committed.
+
+3. Comment and push the code to a feature branch, please note, the comment will be used in the release notes, please **Do Not** start the comment with the version eg 0.6.xx, instead use something like "Bumped xx library to latest version".
 
 4. Raise a PR. Once approved, merge the PR into the main branch.
 
 ### Update artifact version
 
 After all updates are committed and pushed, update the version with the semantic version (major|minor|patch) eg
+For more information review [semantic versioning docs](https://semver.org/).
 
     ```bash
     $ npm version patch

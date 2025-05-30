@@ -40,7 +40,7 @@ jobs:
 
       - name: Get the last commit message
         id: get_message
-        run: echo "text=$(git log -1 --no-merges --pretty=%B)" >> "$GITHUB_OUTPUT"
+        run: echo "text=$(git log -1 --grep=^[0-9]\.[0-9] --invert-grep --no-merges --pretty=%B)" >> "$GITHUB_OUTPUT"
 
       - name: Setup node
         uses: actions/setup-node@v4
